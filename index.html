@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio — Your Name</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #0a0806;
+    --paper: #f5f0e8;
+    --cream: #ede7d3;
+    --red: #1a56db;
+    --gold: #b8860b;
+    --mid: #6b5e4e;
+    --light: #9e8e7e;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    cursor: none;
+    overflow-x: hidden;
+  }
+
+  /* Custom Cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--red);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid var(--paper);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.08s ease, width 0.2s, height 0.2s;
+  }
+  .cursor.active { transform: scale(2); }
+  .cursor-ring.active { width: 60px; height: 60px; border-color: var(--red); }
+
+  /* Nav */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 4rem;
+    mix-blend-mode: difference;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--paper);
+    letter-spacing: 0.02em;
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    color: var(--paper);
+    text-decoration: none;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  /* Hero */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 6rem 4rem 5rem;
+    position: relative;
+    overflow: hidden;
+    background: var(--ink);
+  }
+
+  .hero-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(10rem, 22vw, 22rem);
+    font-weight: 900;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(245,240,232,0.04);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: -0.05em;
+  }
+
+  .hero-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 9vw, 9rem);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    max-width: 14ch;
+    opacity: 0;
+    animation: fadeUp 1s 0.5s forwards;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--red);
+  }
+
+  .hero-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 4rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.9s forwards;
+  }
+
+  .hero-desc {
+    max-width: 38ch;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: var(--light);
+  }
+
+  .hero-scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--light);
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--red), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.4; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(245,240,232,0.08);
+    margin: 0 4rem;
+    width: calc(100% - 8rem);
+  }
+
+  /* Section Base */
+  section { padding: 8rem 4rem; }
+
+  .section-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 1px;
+    background: var(--red);
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 4rem;
+  }
+
+  /* About */
+  #about { background: var(--ink); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: start;
+  }
+  .about-text p {
+    font-size: 0.85rem;
+    line-height: 2;
+    color: var(--light);
+    margin-bottom: 1.5rem;
+  }
+  .about-text p strong {
+    color: var(--paper);
+    font-weight: 500;
+  }
+  .about-quote {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-style: italic;
+    line-height: 1.4;
+    border-left: 3px solid var(--red);
+    padding-left: 2rem;
+    color: var(--paper);
+    margin-top: 2rem;
+  }
+  .about-aside {
+    padding-top: 4rem;
+  }
+  .aside-stat {
+    border-top: 1px solid rgba(245,240,232,0.1);
+    padding: 1.5rem 0;
+  }
+  .aside-stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--red);
+    line-height: 1;
+  }
+  .aside-stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--light);
+    margin-top: 0.3rem;
+  }
+
+  /* Projects */
+  #projects { background: #0e0b09; }
+  .projects-grid {
+    display: grid;
+    gap: 0;
+  }
+  .project-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 2rem;
+    align-items: center;
+    padding: 2.5rem 0;
+    border-top: 1px solid rgba(245,240,232,0.08);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  .project-item:last-child { border-bottom: 1px solid rgba(245,240,232,0.08); }
+  .project-item::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 1px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .project-item:hover::after { transform: scaleX(1); }
+  .project-item:hover .project-title { color: var(--red); }
+  .project-item:hover .project-arrow { transform: translate(4px, -4px); }
+
+  .project-num {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--mid);
+    align-self: flex-start;
+    padding-top: 0.2rem;
+  }
+  .project-info { }
+  .project-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.3rem, 2.5vw, 2rem);
+    font-weight: 700;
+    transition: color 0.3s;
+    margin-bottom: 0.5rem;
+  }
+  .project-meta {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+  .project-tag {
+    background: rgba(26,86,219,0.15);
+    border: 1px solid rgba(26,86,219,0.3);
+    color: var(--red);
+    padding: 0.2rem 0.6rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .project-arrow {
+    font-size: 1.5rem;
+    color: var(--mid);
+    transition: transform 0.3s, color 0.3s;
+  }
+  .project-item:hover .project-arrow { color: var(--red); }
+
+  /* Skills */
+  #skills { background: var(--ink); }
+  .skills-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+  }
+  .skill-category { margin-bottom: 3rem; }
+  .skill-cat-title {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(192,57,43,0.3);
+    padding-bottom: 0.75rem;
+  }
+  .skill-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(245,240,232,0.05);
+  }
+  .skill-name {
+    font-size: 0.8rem;
+    color: var(--paper);
+  }
+  .skill-bar {
+    width: 120px;
+    height: 2px;
+    background: rgba(245,240,232,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  .skill-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 1s ease;
+  }
+  .skill-fill.animated { transform: scaleX(1); }
+
+  /* Blog */
+  #blog { background: #0e0b09; }
+  .blog-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+  }
+  .blog-card {
+    background: #141009;
+    padding: 2.5rem;
+    cursor: pointer;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .blog-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--red);
+    transform: scaleX(0);
+    transition: transform 0.4s;
+    transform-origin: left;
+  }
+  .blog-card:hover { background: #1a140e; }
+  .blog-card:hover::before { transform: scaleX(1); }
+  .blog-date {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 1rem;
+  }
+  .blog-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+    color: var(--paper);
+    transition: color 0.3s;
+  }
+  .blog-card:hover .blog-title { color: var(--red); }
+  .blog-excerpt {
+    font-size: 0.75rem;
+    line-height: 1.8;
+    color: var(--mid);
+  }
+  .blog-read {
+    display: inline-block;
+    margin-top: 1.5rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red);
+    text-decoration: none;
+  }
+
+  /* Contact */
+  #contact {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  #contact .section-label { color: var(--red); }
+  #contact .section-label::before { background: var(--red); }
+  #contact .section-title { color: var(--ink); }
+
+  .contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: start;
+  }
+  .contact-desc {
+    font-size: 0.85rem;
+    line-height: 2;
+    color: var(--mid);
+    margin-bottom: 3rem;
+  }
+  .contact-links { display: flex; flex-direction: column; gap: 1rem; }
+  .contact-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(10,8,6,0.1);
+    transition: color 0.2s;
+  }
+  .contact-link:hover { color: var(--red); }
+  .contact-link-icon {
+    font-size: 1rem;
+    width: 24px;
+    text-align: center;
+  }
+
+  .contact-form { display: flex; flex-direction: column; gap: 1.5rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+  .form-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+  .form-input, .form-textarea {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(10,8,6,0.2);
+    padding: 0.75rem 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+  }
+  .form-input:focus, .form-textarea:focus {
+    border-color: var(--red);
+  }
+  .form-input::placeholder, .form-textarea::placeholder { color: var(--light); }
+
+  .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 1.2rem 2.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: background 0.3s, gap 0.3s;
+    margin-top: 1rem;
+    align-self: flex-start;
+  }
+  .btn-submit:hover { background: var(--red); gap: 1.5rem; }
+  .btn-submit .arrow { transition: transform 0.3s; }
+  .btn-submit:hover .arrow { transform: translateX(4px); }
+
+  /* Footer */
+  footer {
+    background: var(--ink);
+    padding: 2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(245,240,232,0.06);
+  }
+  .footer-copy {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: var(--mid);
+  }
+  .footer-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--light);
+  }
+
+  /* Animations on scroll */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 1.5rem 2rem; }
+    .nav-links { display: none; }
+    section { padding: 5rem 2rem; }
+    #hero { padding: 6rem 2rem 4rem; }
+    .about-grid, .skills-layout, .contact-layout { grid-template-columns: 1fr; gap: 3rem; }
+    .blog-grid { grid-template-columns: 1fr; }
+    .project-item { grid-template-columns: 50px 1fr auto; gap: 1rem; }
+    footer { padding: 1.5rem 2rem; flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <div class="nav-logo">Your Name</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Work</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#blog">Writing</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-text">WORDS</div>
+  <div class="hero-label">Writer & Content Strategist</div>
+  <h1 class="hero-title">Stories that <em>move</em> people.</h1>
+  <div class="hero-bottom">
+    <p class="hero-desc">Crafting narratives that resonate, persuade, and endure. From long-form journalism to brand strategy — every word earns its place.</p>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      scroll
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">Who I Am</div>
+  <div class="about-grid">
+    <div class="about-text reveal">
+      <h2 class="section-title">A writer<br>with teeth.</h2>
+      <p>I'm <strong>Your Name</strong>, a writer and content strategist with a decade of experience turning complex ideas into clear, compelling narratives. My work spans editorial, brand, and digital — but the throughline is always the same: honesty, precision, and a sentence that makes you lean in.</p>
+      <p>I've written for publications that matter, built content strategies for brands that needed direction, and helped founders find the words they couldn't quite reach on their own.</p>
+      <blockquote class="about-quote">"Write hard and clear about what hurts."</blockquote>
+    </div>
+    <div class="about-aside reveal">
+      <div class="aside-stat">
+        <div class="aside-stat-number">10+</div>
+        <div class="aside-stat-label">Years Writing Professionally</div>
+      </div>
+      <div class="aside-stat">
+        <div class="aside-stat-number">200+</div>
+        <div class="aside-stat-label">Articles & Essays Published</div>
+      </div>
+      <div class="aside-stat">
+        <div class="aside-stat-number">40+</div>
+        <div class="aside-stat-label">Brands & Clients Served</div>
+      </div>
+      <div class="aside-stat">
+        <div class="aside-stat-number">3M+</div>
+        <div class="aside-stat-label">Total Reader Reach</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-label">Selected Work</div>
+  <h2 class="section-title reveal">What I've<br>made.</h2>
+  <div class="projects-grid">
+    <div class="project-item reveal">
+      <span class="project-num">01</span>
+      <div class="project-info">
+        <div class="project-title">The Long Disappearance</div>
+        <div class="project-meta">
+          <span>Longform Essay</span>
+          <span>·</span>
+          <span>2024</span>
+          <span class="project-tag">Editorial</span>
+        </div>
+      </div>
+      <span class="project-arrow">↗</span>
+    </div>
+    <div class="project-item reveal">
+      <span class="project-num">02</span>
+      <div class="project-info">
+        <div class="project-title">Brand Voice for Meridian</div>
+        <div class="project-meta">
+          <span>Content Strategy</span>
+          <span>·</span>
+          <span>2024</span>
+          <span class="project-tag">Brand</span>
+        </div>
+      </div>
+      <span class="project-arrow">↗</span>
+    </div>
+    <div class="project-item reveal">
+      <span class="project-num">03</span>
+      <div class="project-info">
+        <div class="project-title">Fifty Words for Grief</div>
+        <div class="project-meta">
+          <span>Personal Essay Series</span>
+          <span>·</span>
+          <span>2023</span>
+          <span class="project-tag">Creative</span>
+        </div>
+      </div>
+      <span class="project-arrow">↗</span>
+    </div>
+    <div class="project-item reveal">
+      <span class="project-num">04</span>
+      <div class="project-info">
+        <div class="project-title">The Founders Issue</div>
+        <div class="project-meta">
+          <span>Feature Reporting</span>
+          <span>·</span>
+          <span>2023</span>
+          <span class="project-tag">Journalism</span>
+        </div>
+      </div>
+      <span class="project-arrow">↗</span>
+    </div>
+    <div class="project-item reveal">
+      <span class="project-num">05</span>
+      <div class="project-info">
+        <div class="project-title">Annual Report — Opal Foundation</div>
+        <div class="project-meta">
+          <span>Copywriting</span>
+          <span>·</span>
+          <span>2022</span>
+          <span class="project-tag">Corporate</span>
+        </div>
+      </div>
+      <span class="project-arrow">↗</span>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">Capabilities</div>
+  <h2 class="section-title reveal">What I<br>bring.</h2>
+  <div class="skills-layout">
+    <div>
+      <div class="skill-category reveal">
+        <div class="skill-cat-title">Writing & Editorial</div>
+        <div class="skill-item"><span class="skill-name">Longform Journalism</span><div class="skill-bar"><div class="skill-fill" data-width="0.95"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Personal Essay</span><div class="skill-bar"><div class="skill-fill" data-width="0.92"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Feature Writing</span><div class="skill-bar"><div class="skill-fill" data-width="0.9"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Editing & Proofreading</span><div class="skill-bar"><div class="skill-fill" data-width="0.88"></div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="skill-category reveal">
+        <div class="skill-cat-title">Strategy & Brand</div>
+        <div class="skill-item"><span class="skill-name">Brand Voice Development</span><div class="skill-bar"><div class="skill-fill" data-width="0.9"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Content Strategy</span><div class="skill-bar"><div class="skill-fill" data-width="0.85"></div></div></div>
+        <div class="skill-item"><span class="skill-name">SEO Writing</span><div class="skill-bar"><div class="skill-fill" data-width="0.8"></div></div></div>
+        <div class="skill-item"><span class="skill-name">Newsletter & Email Copy</span><div class="skill-bar"><div class="skill-fill" data-width="0.87"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BLOG -->
+<section id="blog">
+  <div class="section-label">Recent Writing</div>
+  <h2 class="section-title reveal">From the<br>desk.</h2>
+  <div class="blog-grid">
+    <div class="blog-card reveal">
+      <div class="blog-date">April 2025</div>
+      <div class="blog-title">On Writing Badly, and Why It Saves You</div>
+      <div class="blog-excerpt">Every good draft begins as a bad one. The writers who succeed aren't the most talented — they're the ones who stay in the room with the mess long enough.</div>
+      <a href="#" class="blog-read">Read more →</a>
+    </div>
+    <div class="blog-card reveal">
+      <div class="blog-date">February 2025</div>
+      <div class="blog-title">The Disappearing Art of the Long Sentence</div>
+      <div class="blog-excerpt">We've been told to write short. But brevity without depth is just noise. A meditation on rhythm, patience, and the sentence that refuses to end.</div>
+      <a href="#" class="blog-read">Read more →</a>
+    </div>
+    <div class="blog-card reveal">
+      <div class="blog-date">December 2024</div>
+      <div class="blog-title">What Brand Voice Actually Means</div>
+      <div class="blog-excerpt">It's not about adjectives in a style guide. It's about what a company believes, said out loud, without flinching. Here's how to find it.</div>
+      <a href="#" class="blog-read">Read more →</a>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label">Get in Touch</div>
+  <div class="contact-layout">
+    <div class="reveal">
+      <h2 class="section-title">Let's make<br>something.</h2>
+      <p class="contact-desc">Whether you're looking for a writer to shape your brand's story, a journalist to chase down the truth, or a collaborator who takes words seriously — I'd love to hear from you.</p>
+      <div class="contact-links">
+        <a href="mailto:hello@yourname.com" class="contact-link">
+          <span class="contact-link-icon">✉</span>
+          hello@yourname.com
+        </a>
+        <a href="#" class="contact-link">
+          <span class="contact-link-icon">in</span>
+          linkedin.com/in/yourname
+        </a>
+        <a href="#" class="contact-link">
+          <span class="contact-link-icon">✎</span>
+          @yourname on Substack
+        </a>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="contact-form">
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-input" placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message</label>
+          <textarea class="form-textarea" rows="5" placeholder="Tell me what you're working on..."></textarea>
+        </div>
+        <button class="btn-submit">Send message <span class="arrow">→</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-copy">© 2025 Your Name. All rights reserved.</span>
+  <span class="footer-name">Made with intention.</span>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
+  });
+
+  function animateRing() {
+    rx += (mx - rx - 18) * 0.12;
+    ry += (my - ry - 18) * 0.12;
+    ring.style.transform = `translate(${rx}px, ${ry}px)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, .project-item, .blog-card').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.classList.add('active'); ring.classList.add('active'); });
+    el.addEventListener('mouseleave', () => { cursor.classList.remove('active'); ring.classList.remove('active'); });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Skill bars animate
+  const skillObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.skill-fill').forEach(bar => {
+          const w = bar.dataset.width;
+          bar.style.transform = `scaleX(${w})`;
+          bar.classList.add('animated');
+        });
+        skillObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.skill-category').forEach(el => skillObserver.observe(el));
+</script>
+</body>
+</html>
